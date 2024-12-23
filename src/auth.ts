@@ -6,6 +6,7 @@ import authConfig from "@/auth.config";
 import { getTwoFactorConfirmationByUserId } from "@/actions/verification/two-factor-confirmation";
 import { getAccountByUserId } from "./actions/auth/account";
 import { getUserById } from "./actions/auth/user";
+import type { Adapter } from "@auth/core/adapters";
 
 export const {
   handlers, // : { GET, POST },
@@ -90,7 +91,7 @@ export const {
       return token;
     },
   },
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(db) as Adapter,
   session: { strategy: "jwt" },
   ...authConfig,
 });
