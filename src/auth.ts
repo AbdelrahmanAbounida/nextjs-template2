@@ -8,7 +8,7 @@ import { getAccountByUserId } from "./actions/auth/account";
 import { getUserById } from "./actions/auth/user";
 
 export const {
-  handlers: { GET, POST },
+  handlers, // : { GET, POST },
   auth,
   signIn,
   signOut,
