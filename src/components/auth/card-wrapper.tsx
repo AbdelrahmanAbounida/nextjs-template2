@@ -40,9 +40,9 @@ export const CardWrapper = ({
             </span>
             <hr className="border-t border-gray-300 flex-1 " />
           </div>
-          <CardFooter>
+          {/* <CardFooter>
             <Social />
-          </CardFooter>
+          </CardFooter> */}
         </div>
       )}
       <CardFooter>

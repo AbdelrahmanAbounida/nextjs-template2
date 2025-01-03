@@ -1,14 +1,13 @@
 import * as z from "zod";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "./enums";
 
 export const SettingsSchema = z
   .object({
     name: z.optional(z.string()),
-    isTwoFactorEnabled: z.optional(z.boolean()),
     role: z.enum([UserRole.ADMIN, UserRole.USER]),
     email: z.optional(z.string().email()),
-    password: z.optional(z.string().min(6)),
-    newPassword: z.optional(z.string().min(6)),
+    password: z.optional(z.string().min(4)),
+    newPassword: z.optional(z.string().min(4)),
   })
   .refine(
     (data) => {
@@ -37,17 +36,6 @@ export const SettingsSchema = z
     }
   );
 
-export const NewPasswordSchema = z.object({
-  password: z.string().min(6, {
-    message: "Minimum of 6 characters required",
-  }),
-});
-
-export const ResetSchema = z.object({
-  email: z.string().email({
-    message: "Email is required",
-  }),
-});
 
 export const LoginSchema = z.object({
   email: z.string().email({
@@ -63,8 +51,8 @@ export const RegisterSchema = z.object({
   email: z.string().email({
     message: "Email is required",
   }),
-  password: z.string().min(6, {
-    message: "Minimum 6 characters required",
+  password: z.string().min(4, {
+    message: "Minimum 4 characters required",
   }),
   name: z.string().min(1, {
     message: "Name is required",

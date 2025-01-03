@@ -1,12 +1,11 @@
 import NextAuth from "next-auth";
-import { UserRole } from "@prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import authConfig from "@/auth.config";
-import { getTwoFactorConfirmationByUserId } from "@/actions/verification/two-factor-confirmation";
 import { getAccountByUserId } from "./actions/auth/account";
 import { getUserById } from "./actions/auth/user";
 import type { Adapter } from "@auth/core/adapters";
+import { UserRole } from "./schemas/enums";
 
 export const {
   handlers, // : { GET, POST },
@@ -20,15 +19,15 @@ export const {
     error: "/auth/error",
   },
   events: {
-    async linkAccount({ user }) {
+    async linkAccount({ user }: any) {
       await db.user.update({
-        where: { id: user.id },
+        where: { id: user.id  },
         data: { emailVerified: new Date() },
       });
     },
   },
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account }:any) {
       // Allow OAuth without email verification
       if (account?.provider !== "credentials") return true;
 
@@ -37,32 +36,16 @@ export const {
       // Prevent sign in without email verification
       if (!existingUser?.emailVerified) return false;
 
-      if (existingUser.isTwoFactorEnabled) {
-        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
-          existingUser.id
-        );
-
-        if (!twoFactorConfirmation) return false;
-
-        // Delete two factor confirmation for next sign in
-        await db.twoFactorConfirmation.delete({
-          where: { id: twoFactorConfirmation.id },
-        });
-      }
 
       return true;
     },
     async session({ token, session }) {
       if (token.sub && session.user) {
-        session.user.id = token.sub;
+        session?.user.id as number == parseInt(token.sub) ;
       }
 
       if (token.role && session.user) {
         session.user.role = token.role as UserRole;
-      }
-
-      if (session.user) {
-        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
       }
 
       if (session.user) {
@@ -76,7 +59,7 @@ export const {
     async jwt({ token }) {
       if (!token.sub) return token;
 
-      const existingUser = await getUserById(token.sub);
+      const existingUser = await getUserById(parseInt(token.sub));
 
       if (!existingUser) return token;
 
@@ -86,7 +69,6 @@ export const {
       token.name = existingUser.name;
       token.email = existingUser.email;
       token.role = existingUser.role;
-      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
       return token;
     },

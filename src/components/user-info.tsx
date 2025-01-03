@@ -61,9 +61,9 @@ export const UserInfo = ({
             Two Factor Authentication
           </p>
           <Badge 
-            variant={user?.isTwoFactorEnabled ? "success" : "destructive"}
+            variant={"default"}
           >
-            {user?.isTwoFactorEnabled ? "ON" : "OFF"}
+            {"ON"}
           </Badge>
         </div>
       </CardContent>

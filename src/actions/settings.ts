@@ -2,14 +2,11 @@
 
 import * as z from "zod";
 import bcrypt from "bcryptjs";
-
 import { update } from "@/auth";
 import { db } from "@/lib/db";
 import { SettingsSchema } from "@/schemas/auth-schemas";
 import { currentUser } from "@/lib/auth";
-import { generateVerificationToken } from "@/lib/tokens";
-import { sendVerificationEmail } from "@/lib/mail";
-import { getUserByEmail, getUserById } from "./auth/user";
+import { getUserById } from "./auth/user";
 
 export const settings = async (values: z.infer<typeof SettingsSchema>) => {
   const user = await currentUser();
@@ -28,23 +25,6 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
     values.email = undefined;
     values.password = undefined;
     values.newPassword = undefined;
-    values.isTwoFactorEnabled = undefined;
-  }
-
-  if (values.email && values.email !== user.email) {
-    const existingUser = await getUserByEmail(values.email);
-
-    if (existingUser && existingUser.id !== user.id) {
-      return { error: "Email already in use!" };
-    }
-
-    const verificationToken = await generateVerificationToken(values.email);
-    await sendVerificationEmail(
-      verificationToken.email,
-      verificationToken.token
-    );
-
-    return { success: "Verification email sent!" };
   }
 
   if (values.password && values.newPassword && dbUser.password) {
@@ -73,7 +53,6 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
     user: {
       name: updatedUser.name,
       email: updatedUser.email,
-      isTwoFactorEnabled: updatedUser.isTwoFactorEnabled,
       role: updatedUser.role,
     },
   });
