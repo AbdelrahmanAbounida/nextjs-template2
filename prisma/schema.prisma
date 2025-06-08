@@ -1,7 +1,6 @@
-// TODO:: >> Later auth will be moved to the backend and no need for any orm here 
 
 datasource db {
-  provider  = "sqlite"
+  provider  = "postgres"
   url  	    = env("DATABASE_URL")
 }
 
@@ -38,7 +37,6 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@unique([provider, providerAccountId])
 }
-
 
 
 
